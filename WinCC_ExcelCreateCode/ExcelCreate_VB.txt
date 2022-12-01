@@ -1,0 +1,27 @@
+Sub Export_Excel
+Dim WTS_FLD 'Where To Save Folder'
+Dim WTS_FILE 'Where To Save File, Create a File In abow Folder'
+Dim CRE_FLD 'Create Folder'
+Dim H, Min, S, D, Mon, Y
+
+Y= Year(Date())
+Mon= Month(Date())
+D= Day(Date())
+H= Hour(Time())
+Min= Minute (Time())
+S= Second (Time())
+
+WTS_FLD= "E:\Rapor\" & Y & Mon & D 'Where To Save Folder
+WTS_FILE= WTS_FLD & "\" & "Rapor_" & Y & "_" & Mon & "_" & D & ".xlsx" 'Where To Save FILE'
+
+'This code in order to create a Folder'
+Set CRE_FLD= CreateObject("Scripting.FileSystemObject")
+CRE_FLD.CreateFolder(WTS_FLD)
+
+'This code in order to create new File in Excel'
+Dim CRE_FILE, REF_FILE, TARGET_FILE
+Set CRE_FILE= CreateObject("Scripting.FileSystemObject")
+REF_FILE= "E:\Rapor\Reference_Excel\Report.xlsx" 
+TARGET_FILE = WTS_FILE
+CRE_FILE.CopyFile REF_FILE, TARGET_FILE ' Copy file Report.xls to file Report_year_Month_date,xls
+End Sub  

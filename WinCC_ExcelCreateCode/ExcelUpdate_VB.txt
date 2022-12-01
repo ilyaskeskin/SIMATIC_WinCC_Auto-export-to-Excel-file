@@ -1,0 +1,85 @@
+Sub Excel_Update
+Dim WTS_FLD 'Where To Save Folder'
+Dim WTS_FILE 'Where To Save File, Create a File In abow Folder'
+Dim CRE_FLD 'Create Folder'
+Dim H, Min, S, D, Mon, Y
+
+Y= Year(Date())
+Mon= Month(Date())
+D= Day(Date())
+H= Hour(Time())
+Min= Minute (Time())
+S= Second (Time())
+
+WTS_FLD= "E:\Rapor\" & Y & Mon & D 'Where To Save Folder
+WTS_FILE= WTS_FLD & "\" & "Rapor_" & Y & "_"& Mon &"_" & D & ".xlsx" 'Where To Save FILE' .xls if use Excel 97-2003
+
+Dim objExcelApp, objWorkbook
+Dim WSH_Shell 'Windown Script Host
+Dim XLSrunning, Targetbook, Targetbookrunning
+Dim opening, LastRow
+Dim Dir_file, fso
+Const OverwriteExisting =1
+Set WSH_Shell = CreateObject ("WScript.shell")
+Targetbook = WTS_FILE
+Dir_file = WTS_FILE
+'=================Check if a file exist on local computeR
+Set fso = CreateObject ("Scripting.FileSystemObject")
+If fso.FileExists(Dir_file) Then
+'=================use WMI instead to detect the running Excel
+	opening= GetObject ("winmgmts:root\cimv2").ExecQuery("select * FROM Win32_process WHERE name= 'Excel.exe'").Count 
+	'============If Exist =1, it mean Excel is running, else it is opened already
+If opening>0 Then
+	Set objExcelApp = GetObject ("Excel.Application") 'Call the running Excel Application
+	Targetbookrunning=0 'suppose the TargetBook hasn't been opened first!
+	For Each XLSrunning In objExcelApp.Workbooks
+		If XLSrunning.Name=Targetbook Then
+			Targetbookrunning=1
+			End If
+		Next
+		If Targetbookrunning=1 Then
+			Set objWorkbook= GetObject(Targetbook)
+		Else
+			Set objWorkbook = objExcelApp.Workbooks.Open(Targetbook)
+		End If
+	Else 'opening=0
+			Set objExcelApp = CreateObject ("Excel.Application")
+			Set objWorkbook = objExcelApp.Workbooks.Open(Targetbook)
+			objExcelApp.Visible = False
+			objExcelApp.ScreenUpdating = True
+			objExcelApp.DisplayAlerts = True
+			With objWorkbook.ActiveSheet
+					
+				.Cells(2,5).Value = Date() & "/" & Time()
+				.Cells(4,4).Value = HMIRuntime.Tags("FIT103_GUNLUK").Read
+				.Cells(5,4).Value = HMIRuntime.Tags("FIT100_GUNLUK").Read
+				.Cells(6,4).Value = HMIRuntime.Tags("FIT-205-A_GERI_DEVIR_GUNLUK").Read
+				.Cells(7,4).Value = HMIRuntime.Tags("FIT-206-A_FAZLA_CAMUR_GUNLUK").Read
+				.Cells(8,4).Value = HMIRuntime.Tags("DWS-103-A_GUNLUK").Read
+				.Cells(9,4).Value = HMIRuntime.Tags("DWS-103-B_GUNLUK").Read
+				.Cells(10,4).Value = HMIRuntime.Tags("DWS-103-C_GUNLUK").Read
+				.Cells(11,4).Value = HMIRuntime.Tags("DWS-103-D_GUNLUK").Read
+				.Cells(12,4).Value = HMIRuntime.Tags("DWS-103-E_GUNLUK").Read
+				.Cells(13,4).Value = HMIRuntime.Tags("DWS-103-F_GUNLUK").Read
+				.Cells(14,4).Value = HMIRuntime.Tags("AIT202_1_GUNLUK_ORT").Read
+				.Cells(15,4).Value = HMIRuntime.Tags("AIT202_2_GUNLUK_ORT").Read
+				.Cells(16,4).Value = HMIRuntime.Tags("AIT202_3_GUNLUK_ORT").Read
+				.Cells(17,4).Value = HMIRuntime.Tags("AIT202_4_GUNLUK_ORT").Read
+				.Cells(18,4).Value = HMIRuntime.Tags("ORP200A_GUNLUK_ORT").Read
+				.Cells(19,4).Value = HMIRuntime.Tags("ORP200B_GUNLUK_ORT").Read
+				.Cells(20,4).Value = HMIRuntime.Tags("ORP200C_GUNLUK_ORT").Read
+					
+				
+			End With
+	objWorkbook.Save
+	objWorkbook.Close
+	Set objWorkbook = Nothing
+	objExcelApp.Quit
+	Set objExcelApp = Nothing
+	Set WSH_Shell = Nothing
+	
+	End If
+Else
+End If
+
+End Sub
